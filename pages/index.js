@@ -1,65 +1,52 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Head from "next/head";
+import { useState } from "react";
+
+import AgeGroupsChart from "../components/AgeGroupsChart";
+import useMap from "../hooks/map";
+import { createEmptyGeometry } from "../utils";
+import styles from "../styles/Home.module.css";
 
 export default function Home() {
+  const [stats, setStats] = useState(null);
+  useMap({
+    onClick: async (e, map) => {
+      const { lng, lat } = e.lngLat;
+      const res_da = await fetch(`http://localhost:8000/api/dissemination-area?lng=${lng}&lat=${lat}`);
+      const da = await res_da.json();
+
+      // update map overlay
+      map.getSource("current_area").setData({
+        type: "Feature",
+        geometry: da ? da.geometry : createEmptyGeometry(),
+      });
+
+      // get dissemination area stats
+      if (!da) {
+        setStats(null);
+      } else {
+        const res_stats = await fetch(
+          `http://localhost:8000/api/stats?dissemination_area_id=${da.dissemination_area_id}`
+        );
+        const stats = await res_stats.json();
+        setStats(stats);
+      }
+    },
+  });
+
   return (
     <div className={styles.container}>
       <Head>
-        <title>Create Next App</title>
+        <title>Census Insights</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
+        <div className={styles.map} id="map-view"></div>
+        {!stats ? null : (
+          <div className={styles.dataPanel}>
+            <AgeGroupsChart />
+          </div>
+        )}
       </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
     </div>
-  )
+  );
 }
