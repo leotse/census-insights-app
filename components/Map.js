@@ -1,32 +1,54 @@
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import useMap from "../hooks/map";
+import { getDisseminationAreaByLngLat } from "../services/location";
 import styles from "../styles/Map.module.css";
 import { createEmptyGeometry } from "../utils";
 
-export default function Map() {
-  const dispatch = useDispatch();
-  const { mapInstance, selectedLocation } = useSelector((state) => state.map);
-  useEffect(async () => {
-    if (selectedLocation) {
-      const { lat, lng } = selectedLocation;
-      const res = await fetch(`http://localhost:8000/api/dissemination-area?lng=${lng}&lat=${lat}`);
-      const area = await res.json();
+mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
-      // update map overlay
-      // ideally this should be updated using disseminationArea redux state
-      // but can't figure out how to return map instance from map hooks yet
-      mapInstance.getSource("current_area").setData({
+export default function Map() {
+  console.log("render map");
+  const mapViewId = "map-view";
+  const dispatch = useDispatch();
+  const startLocation = useSelector((state) => state.startLocation);
+  useEffect(async () => {
+    const map = new mapboxgl.Map({
+      center: [startLocation.lng, startLocation.lat],
+      container: mapViewId,
+      style: "mapbox://styles/mapbox/dark-v10",
+      zoom: 12,
+    });
+
+    map.on("load", () => {
+      map.addSource("current_area", {
+        type: "geojson",
+        data: { type: "Feature", geometry: createEmptyGeometry() },
+      });
+      map.addLayer({
+        id: "current_area",
+        source: "current_area",
+        type: "fill",
+        paint: {
+          "fill-color": "#00aedb",
+          "fill-opacity": 0.5,
+        },
+      });
+    });
+
+    map.on("click", async (e) => {
+      const { lat, lng } = e.lngLat;
+      const area = await getDisseminationAreaByLngLat(lng, lat);
+      map.getSource("current_area").setData({
         type: "Feature",
         geometry: area ? area.geometry : createEmptyGeometry(),
       });
-
       dispatch({
         data: { disseminationArea: area },
         type: "DISSEMINATION_AREA_SELECTED",
       });
-    }
-  }, [dispatch, selectedLocation]);
-  useMap();
-  return <div className={styles.map} id="map-view"></div>;
+    });
+  }, []);
+  return <div className={styles.map} id={mapViewId}></div>;
 }

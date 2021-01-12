@@ -30,3 +30,9 @@ export function randomLocation() {
   const index = Math.floor(Math.random() * cities.length);
   return cities[index];
 }
+
+export async function getDisseminationAreaByLngLat(lng, lat) {
+  const res = await fetch(`http://localhost:8000/api/dissemination-area?lng=${lng}&lat=${lat}`);
+  const area = await res.json();
+  return area;
+}

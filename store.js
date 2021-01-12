@@ -10,15 +10,6 @@ const reducer = (state, action) => {
           selectedDisseminationArea: action.data.disseminationArea,
         },
       };
-    case "MAP_CLICK":
-      const { location, map } = action.data;
-      return {
-        ...state,
-        map: {
-          mapInstance: map,
-          selectedLocation: location,
-        },
-      };
   }
   console.warn("unhanlded action:", action.type);
   return state;
