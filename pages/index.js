@@ -1,6 +1,6 @@
 import Head from "next/head";
 import DataPanel from "../components/DataPanel";
-import Map from "../components/Map";
+import MapView from "../components/MapView";
 import { randomLocation } from "../services/location";
 import styles from "../styles/Home.module.css";
 
@@ -12,7 +12,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <Map />
+        <MapView />
         <DataPanel />
       </main>
     </div>

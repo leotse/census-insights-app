@@ -1,4 +1,5 @@
-export async function getAgeGroups(disseminationAreaId) {
-  const res = await fetch(`http://localhost:8000/api/stats?dissemination_area_id=${disseminationAreaId}`);
+export async function getAgeGroups(daIds) {
+  const q = daIds.map((daId) => `dissemination_area_ids=${daId}`).join("&");
+  const res = await fetch(`http://localhost:8000/api/stats?${q}`);
   return await res.json();
 }

@@ -8,11 +8,12 @@ import { createEmptyGeometry } from "../utils";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
-export default function Map() {
-  console.log("render map");
+export default function MapView() {
   const mapViewId = "map-view";
+  const selectedAreas = new Map();
   const dispatch = useDispatch();
   const startLocation = useSelector((state) => state.startLocation);
+
   useEffect(async () => {
     const map = new mapboxgl.Map({
       center: [startLocation.lng, startLocation.lat],
@@ -24,7 +25,10 @@ export default function Map() {
     map.on("load", () => {
       map.addSource("current_area", {
         type: "geojson",
-        data: { type: "Feature", geometry: createEmptyGeometry() },
+        data: {
+          type: "FeatureCollection",
+          features: [createEmptyGeometry()],
+        },
       });
       map.addLayer({
         id: "current_area",
@@ -40,15 +44,23 @@ export default function Map() {
     map.on("click", async (e) => {
       const { lat, lng } = e.lngLat;
       const area = await getDisseminationAreaByLngLat(lng, lat);
+      if (area && selectedAreas.has(area.id)) {
+        selectedAreas.delete(area.id);
+      } else if (area) {
+        selectedAreas.set(area.id, area);
+      }
+
+      const areas = [...selectedAreas.values()];
       map.getSource("current_area").setData({
-        type: "Feature",
-        geometry: area ? area.geometry : createEmptyGeometry(),
+        type: "FeatureCollection",
+        features: areas,
       });
       dispatch({
-        data: { disseminationArea: area },
-        type: "DISSEMINATION_AREA_SELECTED",
+        data: { areas },
+        type: "DISSEMINATION_AREAS_CHANGED",
       });
     });
   }, []);
+
   return <div className={styles.map} id={mapViewId}></div>;
 }
