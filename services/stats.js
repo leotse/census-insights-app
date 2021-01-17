@@ -1,5 +1,5 @@
 export async function getAgeGroups(lngLats) {
-  const res = await fetch("http://localhost:8000/api/stats_by_lnglats", {
+  const res = await fetch("http://localhost:8000/api/stats-by-lnglats", {
     body: JSON.stringify(lngLats),
     headers: { "Content-Type": "application/json;charset=utf-8" },
     method: "POST",

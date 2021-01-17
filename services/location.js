@@ -31,8 +31,12 @@ export function randomLocation() {
   return cities[3];
 }
 
-export async function getDisseminationAreaByLngLat(lng, lat) {
-  const res = await fetch(`http://localhost:8000/api/dissemination-area?lng=${lng}&lat=${lat}`);
-  const area = await res.json();
-  return area;
+export async function getDisseminationAreasByLngLats(lngLats) {
+  const res = await fetch("http://localhost:8000/api/dissemination-areas-by-lnglats", {
+    body: JSON.stringify(lngLats),
+    headers: { "Content-Type": "application/json;charset=utf-8" },
+    method: "POST",
+  });
+  const areas = await res.json();
+  return areas;
 }

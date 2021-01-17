@@ -2,7 +2,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getDisseminationAreaByLngLat } from "../services/location";
+import { getDisseminationAreasByLngLats } from "../services/location";
 import styles from "../styles/Map.module.css";
 import { createEmptyGeometry } from "../utils";
 
@@ -56,7 +56,7 @@ export default function MapView() {
     if (!mapInstance) {
       return;
     }
-    const selectedAreas = await Promise.all(lngLats.map((d) => getDisseminationAreaByLngLat(d.lng, d.lat)));
+    const selectedAreas = await getDisseminationAreasByLngLats(lngLats);
     const areas = [...selectedAreas.values()];
     mapInstance.getSource("current_area").setData({
       type: "FeatureCollection",

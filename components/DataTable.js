@@ -67,10 +67,10 @@ export default function DataTable() {
           {lngLats.map((r, i) => (
             <tr key={i}>
               <td>
-                <input value={r.lng} readonly={true}></input>
+                <input value={r.lng} readOnly={true}></input>
               </td>
               <td>
-                <input value={r.lat} readonly={true}></input>
+                <input value={r.lat} readOnly={true}></input>
               </td>
               <td>
                 <input value={1} readOnly={true}></input>
