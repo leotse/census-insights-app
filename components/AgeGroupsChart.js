@@ -5,19 +5,18 @@ import { getAgeGroups } from "../services/stats";
 
 export default function AgeGroupsChart() {
   const [data, setData] = useState(null);
-  const areas = useSelector((state) => state.map.selectedDisseminationAreas);
+  const lngLats = useSelector((state) => state.map.selectedLngLats);
   useEffect(async () => {
-    if (areas.length === 0) {
+    if (lngLats.length === 0) {
       setData(null);
     } else {
-      const daIds = areas.map((a) => a.dissemination_area_id);
-      const ageGroups = await getAgeGroups(daIds);
+      const ageGroups = await getAgeGroups(lngLats);
       const chartData = Object.keys(ageGroups)
         .filter((k) => k.indexOf("age_") === 0)
         .map((k) => ({ name: k.replace("age_", "").replace("_to_", "-"), value: ageGroups[k] }));
       setData(chartData);
     }
-  }, [areas]);
+  }, [lngLats]);
   return !data ? null : (
     <BarChart width={300} height={150} data={data}>
       <XAxis dataKey="name" />

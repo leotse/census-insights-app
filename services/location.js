@@ -28,7 +28,7 @@ const cities = [
 
 export function randomLocation() {
   const index = Math.floor(Math.random() * cities.length);
-  return cities[index];
+  return cities[3];
 }
 
 export async function getDisseminationAreaByLngLat(lng, lat) {

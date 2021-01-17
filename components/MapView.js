@@ -1,6 +1,6 @@
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getDisseminationAreaByLngLat } from "../services/location";
 import styles from "../styles/Map.module.css";
@@ -10,11 +10,12 @@ mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 export default function MapView() {
   const mapViewId = "map-view";
-  const selectedAreas = new Map();
   const dispatch = useDispatch();
   const startLocation = useSelector((state) => state.startLocation);
+  const lngLats = useSelector((state) => state.map.selectedLngLats);
+  const [mapInstance, setMapInstance] = useState(null);
 
-  useEffect(async () => {
+  useEffect(() => {
     const map = new mapboxgl.Map({
       center: [startLocation.lng, startLocation.lat],
       container: mapViewId,
@@ -39,28 +40,29 @@ export default function MapView() {
           "fill-opacity": 0.5,
         },
       });
+      setMapInstance(map);
     });
 
-    map.on("click", async (e) => {
+    map.on("click", (e) => {
       const { lat, lng } = e.lngLat;
-      const area = await getDisseminationAreaByLngLat(lng, lat);
-      if (area && selectedAreas.has(area.id)) {
-        selectedAreas.delete(area.id);
-      } else if (area) {
-        selectedAreas.set(area.id, area);
-      }
-
-      const areas = [...selectedAreas.values()];
-      map.getSource("current_area").setData({
-        type: "FeatureCollection",
-        features: areas,
-      });
       dispatch({
-        data: { areas },
-        type: "DISSEMINATION_AREAS_CHANGED",
+        data: { lngLat: { lng, lat } },
+        type: "LNGLATS_ADD",
       });
     });
   }, []);
+
+  useEffect(async () => {
+    if (!mapInstance) {
+      return;
+    }
+    const selectedAreas = await Promise.all(lngLats.map((d) => getDisseminationAreaByLngLat(d.lng, d.lat)));
+    const areas = [...selectedAreas.values()];
+    mapInstance.getSource("current_area").setData({
+      type: "FeatureCollection",
+      features: areas,
+    });
+  }, [mapInstance, lngLats]);
 
   return <div className={styles.map} id={mapViewId}></div>;
 }

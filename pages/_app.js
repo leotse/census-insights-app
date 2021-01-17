@@ -6,7 +6,7 @@ export default function MyApp({ Component, pageProps }) {
   const store = initStore(pageProps);
   return (
     <Provider store={store}>
-      <Component {...pageProps} />;
+      <Component {...pageProps} />
     </Provider>
   );
 }

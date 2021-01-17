@@ -1,0 +1,31 @@
+.dataTable {
+  border: solid 1px #bcbcbc;
+  border-collapse: collapse;
+  color: #dedede;
+  width: 100%;
+}
+
+.dataTable td {
+  border-right: solid 1px #bcbcbc;
+  padding: 5px;
+}
+
+.dataTable thead tr {
+  border-bottom: solid 1px #bcbcbc;
+}
+
+.buttons {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: row;
+}
+
+.buttons .add,
+.buttons .save {
+  align-self: flex-start;
+}
+
+.buttons .reset {
+  align-self: flex-end;
+  margin-left: auto;
+}

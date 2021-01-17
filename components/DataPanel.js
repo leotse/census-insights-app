@@ -1,11 +1,11 @@
-import { useSelector } from "react-redux";
 import styles from "../styles/DataPanel.module.css";
 import AgeGroupsChart from "./AgeGroupsChart";
+import DataTable from "./DataTable";
 
 export default function DataPanel() {
-  const areas = useSelector((state) => state.map.selectedDisseminationAreas);
-  return areas.length === 0 ? null : (
+  return (
     <div className={styles.dataPanel}>
+      <DataTable />
       <AgeGroupsChart />
     </div>
   );
