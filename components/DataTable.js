@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "react-data-grid/dist/react-data-grid.css";
 import { useDispatch, useSelector } from "react-redux";
 import styles from "../styles/DataTable.module.css";
 

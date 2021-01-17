@@ -1,12 +1,19 @@
 import styles from "../styles/DataPanel.module.css";
-import AgeGroupsChart from "./AgeGroupsChart";
-import DataTable from "./DataTable";
 
-export default function DataPanel() {
+import classnames from "classnames";
+
+export default function DataPanel({ align = "topLeft", children = [] }) {
   return (
-    <div className={styles.dataPanel}>
-      <DataTable />
-      <AgeGroupsChart />
+    <div
+      className={classnames({
+        [styles.dataPanel]: true,
+        [styles.top]: align.toLowerCase().indexOf("top") >= 0,
+        [styles.bottom]: align.toLowerCase().indexOf("bottom") >= 0,
+        [styles.left]: align.toLowerCase().indexOf("left") >= 0,
+        [styles.right]: align.toLowerCase().indexOf("right") >= 0,
+      })}
+    >
+      {children}
     </div>
   );
 }

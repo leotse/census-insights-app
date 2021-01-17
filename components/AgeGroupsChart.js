@@ -6,6 +6,7 @@ import { getAgeGroups } from "../services/stats";
 export default function AgeGroupsChart() {
   const [data, setData] = useState(null);
   const lngLats = useSelector((state) => state.map.selectedLngLats);
+
   useEffect(async () => {
     if (lngLats.length === 0) {
       setData(null);
@@ -17,10 +18,11 @@ export default function AgeGroupsChart() {
       setData(chartData);
     }
   }, [lngLats]);
+
   return !data ? null : (
-    <BarChart width={300} height={150} data={data}>
-      <XAxis dataKey="name" />
-      <YAxis type="number" />
+    <BarChart width={350} height={150} data={data}>
+      <XAxis dataKey="name" stroke="#dedede" />
+      <YAxis type="number" stroke="#dedede" />
       <Bar dataKey="value" fill="#00aedb" />
     </BarChart>
   );
